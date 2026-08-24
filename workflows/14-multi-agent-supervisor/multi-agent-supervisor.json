@@ -1,0 +1,202 @@
+{
+  "nodes": [
+    {
+      "id": "seqStart_0",
+      "position": { "x": 50, "y": 300 },
+      "type": "customNode",
+      "data": {
+        "id": "seqStart_0", "label": "Start", "version": 2, "name": "seqStart", "type": "Start",
+        "baseClasses": ["Start"], "category": "Sequential Agents",
+        "inputParams": [], "inputAnchors": [], "inputs": {},
+        "outputAnchors": [{ "id": "seqStart_0-output-seqStart-Start", "name": "seqStart", "label": "Start", "type": "Start" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 150
+    },
+    {
+      "id": "seqAgent_supervisor",
+      "position": { "x": 450, "y": 100 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_supervisor", "label": "Agent", "version": 4, "name": "seqAgent", "type": "Agent",
+        "baseClasses": ["Agent"], "category": "Sequential Agents",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_supervisor-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_supervisor-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_supervisor-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_supervisor-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_supervisor-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_supervisor-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOllama_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqStart_0.data.instance}}",
+          "agentName": "Supervisor",
+          "systemPrompt": "Você é um SUPERVISOR de equipe de marketing. Receba a tarefa e decida QUAL worker ativar.\n\nWorkers disponíveis:\n- REDATOR: Cria textos, copies, emails, posts\n- ANALISTA: Fornece dados, métricas, benchmarks\n- PLANEJADOR: Cria estratégias e cronogramas\n\nRegras:\n1. Analise a tarefa e decida qual worker é necessário\n2. Ative um worker por vez\n3. Após receber o resultado, decida: ativar outro worker ou finalizar\n4. Para delegar, responda APENAS: REDATOR, ANALISTA ou PLANEJADOR\n5. Para finalizar, responda: FINISH seguido do resultado compilado\n6. Responda em português do Brasil\n7. Seja eficiente - não ative workers desnecessariamente",
+          "maxIterations": "10"
+        },
+        "outputAnchors": [{ "id": "seqAgent_supervisor-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 650
+    },
+    {
+      "id": "seqCondition_0",
+      "position": { "x": 850, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "id": "seqCondition_0", "label": "Condition", "version": 2, "name": "seqCondition", "type": "Condition",
+        "baseClasses": ["Condition"], "category": "Sequential Agents",
+        "inputParams": [{ "label": "Conditions", "name": "conditions", "type": "conditionUI", "id": "seqCondition_0-input-conditions-conditionUI" }],
+        "inputAnchors": [{ "label": "Agent | LLMNode", "name": "sequentialNode", "type": "Agent | LLMNode", "id": "seqCondition_0-input-sequentialNode-Agent" }],
+        "inputs": {
+          "sequentialNode": "{{seqAgent_supervisor.data.instance}}",
+          "conditions": [
+            { "variable": "output", "operation": "contains", "value": "REDATOR", "output": "seqAgent_redator" },
+            { "variable": "output", "operation": "contains", "value": "ANALISTA", "output": "seqAgent_analista" },
+            { "variable": "output", "operation": "contains", "value": "PLANEJADOR", "output": "seqAgent_planejador" },
+            { "variable": "output", "operation": "contains", "value": "FINISH", "output": "seqEnd_0" }
+          ]
+        },
+        "outputAnchors": [
+          { "id": "seqCondition_0-output-redator-Condition", "name": "redator", "label": "REDATOR", "type": "Condition" },
+          { "id": "seqCondition_0-output-analista-Condition", "name": "analista", "label": "ANALISTA", "type": "Condition" },
+          { "id": "seqCondition_0-output-planejador-Condition", "name": "planejador", "label": "PLANEJADOR", "type": "Condition" },
+          { "id": "seqCondition_0-output-finish-Condition", "name": "finish", "label": "FINISH", "type": "Condition" }
+        ],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 450
+    },
+    {
+      "id": "seqAgent_redator",
+      "position": { "x": 1300, "y": -100 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_redator", "label": "Agent", "version": 4, "name": "seqAgent", "type": "Agent",
+        "baseClasses": ["Agent"], "category": "Sequential Agents",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_redator-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_redator-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_redator-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_redator-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_redator-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_redator-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOllama_0.data.instance}}", "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Redator",
+          "systemPrompt": "Você é um REDATOR CRIATIVO de marketing digital. Crie textos persuasivos em português do Brasil.\n\nFormatos que domina: emails marketing, posts Instagram/LinkedIn, headlines, CTAs, descrições de produto.\n\nRegras:\n- Adapte o tom ao público-alvo\n- Inclua CTAs quando relevante\n- Seja conciso mas impactante\n- Retorne APENAS o texto solicitado",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [{ "id": "seqAgent_redator-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_analista",
+      "position": { "x": 1300, "y": 250 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_analista", "label": "Agent", "version": 4, "name": "seqAgent", "type": "Agent",
+        "baseClasses": ["Agent"], "category": "Sequential Agents",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_analista-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_analista-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_analista-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_analista-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_analista-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_analista-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOllama_0.data.instance}}", "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Analista",
+          "systemPrompt": "Você é um ANALISTA DE DADOS de marketing. Forneça insights baseados em dados e benchmarks.\n\nExpertise: métricas de email (abertura, clique, conversão), redes sociais (engajamento, alcance), ROI de campanhas, benchmarks por indústria.\n\nRegras:\n- Use números e porcentagens\n- Cite benchmarks de mercado\n- Sugira KPIs para acompanhar\n- Seja objetivo e data-driven\n- Responda em português do Brasil",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [{ "id": "seqAgent_analista-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_planejador",
+      "position": { "x": 1300, "y": 600 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_planejador", "label": "Agent", "version": 4, "name": "seqAgent", "type": "Agent",
+        "baseClasses": ["Agent"], "category": "Sequential Agents",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_planejador-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_planejador-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_planejador-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_planejador-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_planejador-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_planejador-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOllama_0.data.instance}}", "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Planejador",
+          "systemPrompt": "Você é um PLANEJADOR ESTRATÉGICO de marketing. Crie planos de ação estruturados.\n\nExpertise: estratégias de campanha, cronogramas, definição de público-alvo, canais de distribuição, orçamento.\n\nRegras:\n- Estruture com bullets e numeração\n- Inclua timeline quando relevante\n- Defina responsáveis e prazos\n- Seja prático e executável\n- Responda em português do Brasil",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [{ "id": "seqAgent_planejador-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 600
+    },
+    {
+      "id": "seqEnd_0",
+      "position": { "x": 1750, "y": 350 },
+      "type": "customNode",
+      "data": {
+        "id": "seqEnd_0", "label": "End", "version": 1, "name": "seqEnd", "type": "End",
+        "baseClasses": ["End"], "category": "Sequential Agents",
+        "inputParams": [],
+        "inputAnchors": [{ "label": "Agent | Condition | LLMNode", "name": "sequentialNode", "type": "Agent | Condition | LLMNode", "list": true, "id": "seqEnd_0-input-sequentialNode-Agent" }],
+        "inputs": { "sequentialNode": ["{{seqAgent_redator.data.instance}}", "{{seqAgent_analista.data.instance}}", "{{seqAgent_planejador.data.instance}}", "{{seqCondition_0.data.instance}}"] },
+        "outputAnchors": [], "outputs": {}, "selected": false
+      }, "width": 300, "height": 200
+    },
+    {
+      "id": "chatOllama_0",
+      "position": { "x": 700, "y": -200 },
+      "type": "customNode",
+      "data": {
+        "id": "chatOllama_0", "label": "ChatOllama", "version": 4, "name": "chatOllama", "type": "ChatOllama",
+        "baseClasses": ["ChatOllama", "BaseChatModel", "BaseLanguageModel", "Runnable"], "category": "Chat Models",
+        "inputParams": [
+          { "label": "Base URL", "name": "baseUrl", "type": "string", "default": "http://host.containers.internal:11434", "id": "chatOllama_0-input-baseUrl-string" },
+          { "label": "Model Name", "name": "modelName", "type": "string", "id": "chatOllama_0-input-modelName-string" },
+          { "label": "Temperature", "name": "temperature", "type": "number", "default": 0.7, "optional": true, "id": "chatOllama_0-input-temperature-number" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "baseUrl": "http://host.containers.internal:11434", "modelName": "llama3.2", "temperature": "0.7" },
+        "outputAnchors": [{ "id": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "name": "chatOllama", "label": "ChatOllama", "type": "ChatOllama | BaseChatModel | BaseLanguageModel | Runnable" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 400
+    }
+  ],
+  "edges": [
+    { "source": "seqStart_0", "sourceHandle": "seqStart_0-output-seqStart-Start", "target": "seqAgent_supervisor", "targetHandle": "seqAgent_supervisor-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-start-supervisor" },
+    { "source": "seqAgent_supervisor", "sourceHandle": "seqAgent_supervisor-output-seqAgent-Agent", "target": "seqCondition_0", "targetHandle": "seqCondition_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-supervisor-condition" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-redator-Condition", "target": "seqAgent_redator", "targetHandle": "seqAgent_redator-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-cond-redator" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-analista-Condition", "target": "seqAgent_analista", "targetHandle": "seqAgent_analista-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-cond-analista" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-planejador-Condition", "target": "seqAgent_planejador", "targetHandle": "seqAgent_planejador-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-cond-planejador" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-finish-Condition", "target": "seqEnd_0", "targetHandle": "seqEnd_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-cond-end" },
+    { "source": "seqAgent_redator", "sourceHandle": "seqAgent_redator-output-seqAgent-Agent", "target": "seqAgent_supervisor", "targetHandle": "seqAgent_supervisor-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-redator-supervisor" },
+    { "source": "seqAgent_analista", "sourceHandle": "seqAgent_analista-output-seqAgent-Agent", "target": "seqAgent_supervisor", "targetHandle": "seqAgent_supervisor-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-analista-supervisor" },
+    { "source": "seqAgent_planejador", "sourceHandle": "seqAgent_planejador-output-seqAgent-Agent", "target": "seqAgent_supervisor", "targetHandle": "seqAgent_supervisor-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-planejador-supervisor" },
+    { "source": "chatOllama_0", "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_supervisor", "targetHandle": "seqAgent_supervisor-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-supervisor" },
+    { "source": "chatOllama_0", "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_redator", "targetHandle": "seqAgent_redator-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-redator" },
+    { "source": "chatOllama_0", "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_analista", "targetHandle": "seqAgent_analista-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-analista" },
+    { "source": "chatOllama_0", "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_planejador", "targetHandle": "seqAgent_planejador-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-planejador" }
+  ]
+}

@@ -1,0 +1,329 @@
+{
+  "nodes": [
+    {
+      "id": "seqStart_0",
+      "position": { "x": 50, "y": 250 },
+      "type": "customNode",
+      "data": {
+        "id": "seqStart_0",
+        "label": "Start",
+        "version": 2,
+        "name": "seqStart",
+        "type": "Start",
+        "baseClasses": ["Start"],
+        "category": "Sequential Agents",
+        "description": "Starting point of the conversation",
+        "inputParams": [],
+        "inputAnchors": [],
+        "inputs": {},
+        "outputAnchors": [
+          { "id": "seqStart_0-output-seqStart-Start", "name": "seqStart", "label": "Start", "type": "Start" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 150
+    },
+    {
+      "id": "seqAgent_classificador",
+      "position": { "x": 450, "y": 100 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_classificador",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "Agent that classifies intent",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_classificador-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_classificador-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_classificador-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_classificador-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_classificador-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_classificador-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqStart_0.data.instance}}",
+          "agentName": "Classificador",
+          "systemPrompt": "Você é um classificador de intenções. Sua ÚNICA tarefa é analisar a mensagem do usuário e classificá-la em uma das seguintes categorias:\n\n- VENDAS: perguntas sobre produtos, preços, promoções, compras, pedidos\n- SUPORTE: problemas técnicos, reclamações, bugs, defeitos, devoluções\n- RH: férias, salário, benefícios, contratação, demissão, ponto\n- GERAL: saudações, agradecimentos, perguntas que não se encaixam nas outras\n\nRESPONDA APENAS com a categoria em MAIÚSCULAS. Nada mais. Exemplo:\nUsuário: 'Quanto custa o plano premium?' → VENDAS\nUsuário: 'Meu app travou' → SUPORTE\nUsuário: 'Quantos dias de férias tenho?' → RH\nUsuário: 'Oi, tudo bem?' → GERAL",
+          "maxIterations": "1"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_classificador-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqCondition_0",
+      "position": { "x": 850, "y": 150 },
+      "type": "customNode",
+      "data": {
+        "id": "seqCondition_0",
+        "label": "Condition",
+        "version": 2,
+        "name": "seqCondition",
+        "type": "Condition",
+        "baseClasses": ["Condition"],
+        "category": "Sequential Agents",
+        "description": "Conditional node to route to different paths based on conditions",
+        "inputParams": [
+          {
+            "label": "Conditions",
+            "name": "conditions",
+            "type": "conditionUI",
+            "id": "seqCondition_0-input-conditions-conditionUI"
+          }
+        ],
+        "inputAnchors": [
+          { "label": "Agent | LLMNode", "name": "sequentialNode", "type": "Agent | LLMNode", "id": "seqCondition_0-input-sequentialNode-Agent" }
+        ],
+        "inputs": {
+          "sequentialNode": "{{seqAgent_classificador.data.instance}}",
+          "conditions": [
+            { "variable": "output", "operation": "contains", "value": "VENDAS", "output": "seqAgent_vendas" },
+            { "variable": "output", "operation": "contains", "value": "SUPORTE", "output": "seqAgent_suporte" },
+            { "variable": "output", "operation": "contains", "value": "RH", "output": "seqAgent_rh" },
+            { "variable": "output", "operation": "contains", "value": "GERAL", "output": "seqAgent_geral" }
+          ]
+        },
+        "outputAnchors": [
+          { "id": "seqCondition_0-output-vendas-Condition", "name": "vendas", "label": "VENDAS", "type": "Condition" },
+          { "id": "seqCondition_0-output-suporte-Condition", "name": "suporte", "label": "SUPORTE", "type": "Condition" },
+          { "id": "seqCondition_0-output-rh-Condition", "name": "rh", "label": "RH", "type": "Condition" },
+          { "id": "seqCondition_0-output-geral-Condition", "name": "geral", "label": "GERAL (default)", "type": "Condition" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 450
+    },
+    {
+      "id": "seqAgent_vendas",
+      "position": { "x": 1300, "y": -200 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_vendas",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "Sales specialist agent",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_vendas-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_vendas-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_vendas-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_vendas-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_vendas-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_vendas-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Especialista Vendas",
+          "systemPrompt": "Você é um ESPECIALISTA DE VENDAS entusiasmado e profissional.\n\nProdutos da empresa:\n- Plano Básico: R$ 29/mês (5 usuários, 10GB)\n- Plano Pro: R$ 79/mês (20 usuários, 100GB, suporte prioritário)\n- Plano Enterprise: R$ 199/mês (ilimitado, SLA 99.9%, gerente dedicado)\n\nPromoção atual: 20% OFF no plano anual.\n\nRegras:\n1. Seja consultivo — entenda a necessidade antes de sugerir\n2. Destaque benefícios, não só features\n3. Sempre ofereça o trial gratuito de 14 dias\n4. Se o cliente quiser comprar, diga para acessar vendas@empresa.com\n5. Responda em português do Brasil",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_vendas-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_suporte",
+      "position": { "x": 1300, "y": 150 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_suporte",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "Support specialist agent",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_suporte-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_suporte-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_suporte-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_suporte-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_suporte-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_suporte-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Especialista Suporte",
+          "systemPrompt": "Você é um ESPECIALISTA DE SUPORTE TÉCNICO paciente e detalhista.\n\nProblemas comuns e soluções:\n1. App travando → Limpar cache (Configurações > App > Limpar dados)\n2. Login não funciona → Verificar email correto, resetar senha em /forgot-password\n3. Erro 500 → Problema no servidor, equipe já foi notificada, prazo: 2h\n4. Lentidão → Verificar conexão de internet, tentar outro navegador\n5. Cobrança indevida → Escalar para financeiro (ticket automático)\n\nRegras:\n1. Peça detalhes: qual dispositivo, qual navegador, quando começou\n2. Dê passos numerados e claros\n3. Se não resolver em 3 tentativas, ofereça escalar para suporte N2\n4. Sempre pergunte: 'Isso resolveu seu problema?'\n5. Responda em português do Brasil",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_suporte-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_rh",
+      "position": { "x": 1300, "y": 500 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_rh",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "HR specialist agent",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_rh-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_rh-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_rh-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_rh-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_rh-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_rh-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Especialista RH",
+          "systemPrompt": "Você é um ESPECIALISTA DE RH simpático e informativo.\n\nPolíticas da empresa:\n- Férias: 30 dias após 12 meses. Solicitar com 30 dias de antecedência via portal.\n- Vale Refeição: R$ 45/dia útil, creditado dia 1 de cada mês.\n- Vale Transporte: 6% desconto no salário base.\n- Home Office: terça e quinta (pode negociar com gestor).\n- Plano de Saúde: Unimed, extensível para dependentes (custo 50/50).\n- 13º salário: 1ª parcela novembro, 2ª parcela dezembro.\n- Horário flexível: entrada 8h-10h, saída 17h-19h (8h/dia).\n\nRegras:\n1. Seja preciso — cite as políticas acima\n2. Se a pergunta for sobre algo fora dessas políticas, diga que vai verificar com RH\n3. Para solicitações (férias, atestado), direcione ao portal: portal.rh.empresa.com\n4. Responda em português do Brasil",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_rh-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_geral",
+      "position": { "x": 1300, "y": 850 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_geral",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "General purpose agent",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "id": "seqAgent_geral-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_geral-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_geral-input-maxIterations-number" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_geral-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_geral-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_geral-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqCondition_0.data.instance}}",
+          "agentName": "Assistente Geral",
+          "systemPrompt": "Você é um assistente geral amigável. Responda em português do Brasil.\n\nVocê cuida de:\n- Saudações e boas-vindas\n- Perguntas gerais que não são de Vendas, Suporte ou RH\n- Redirecionar quando necessário\n\nSe o usuário perguntar algo que deveria ir para outro departamento, diga:\n'Parece que essa questão é sobre [VENDAS/SUPORTE/RH]. Posso te redirecionar? Basta reformular sua pergunta focando nesse tema.'\n\nSeja breve, simpático e útil.",
+          "maxIterations": "2"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_geral-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqEnd_0",
+      "position": { "x": 1750, "y": 350 },
+      "type": "customNode",
+      "data": {
+        "id": "seqEnd_0",
+        "label": "End",
+        "version": 1,
+        "name": "seqEnd",
+        "type": "End",
+        "baseClasses": ["End"],
+        "category": "Sequential Agents",
+        "description": "End node of the sequential workflow",
+        "inputParams": [],
+        "inputAnchors": [
+          { "label": "Agent | Condition | LLMNode", "name": "sequentialNode", "type": "Agent | Condition | LLMNode", "list": true, "id": "seqEnd_0-input-sequentialNode-Agent" }
+        ],
+        "inputs": {
+          "sequentialNode": ["{{seqAgent_vendas.data.instance}}", "{{seqAgent_suporte.data.instance}}", "{{seqAgent_rh.data.instance}}", "{{seqAgent_geral.data.instance}}"]
+        },
+        "outputAnchors": [],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 200
+    },
+    {
+      "id": "chatOpenAI_0",
+      "position": { "x": 450, "y": -300 },
+      "type": "customNode",
+      "data": {
+        "id": "chatOpenAI_0",
+        "label": "ChatOllama",
+        "version": 4,
+        "name": "chatOllama",
+        "type": "ChatOllama",
+        "baseClasses": ["ChatOllama", "BaseChatModel", "BaseLanguageModel", "Runnable"],
+        "category": "Chat Models",
+        "description": "Chat completion using open-source LLM on Ollama",
+        "inputParams": [
+          { "label": "Base URL", "name": "baseUrl", "type": "string", "default": "http://host.containers.internal:11434", "id": "chatOpenAI_0-input-baseUrl-string" },
+          { "label": "Model Name", "name": "modelName", "type": "string", "placeholder": "llama3.2", "id": "chatOpenAI_0-input-modelName-string" },
+          { "label": "Temperature", "name": "temperature", "type": "number", "default": 0.7, "optional": true, "id": "chatOpenAI_0-input-temperature-number" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "baseUrl": "http://host.containers.internal:11434", "modelName": "llama3.2", "temperature": "0.3" },
+        "outputAnchors": [
+          { "id": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "name": "chatOpenAI", "label": "ChatOpenAI", "type": "ChatOpenAI | BaseChatModel | BaseLanguageModel | Runnable" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 400
+    }
+  ],
+  "edges": [
+    { "source": "seqStart_0", "sourceHandle": "seqStart_0-output-seqStart-Start", "target": "seqAgent_classificador", "targetHandle": "seqAgent_classificador-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-start-classificador" },
+    { "source": "seqAgent_classificador", "sourceHandle": "seqAgent_classificador-output-seqAgent-Agent", "target": "seqCondition_0", "targetHandle": "seqCondition_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-classificador-condition" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-vendas-Condition", "target": "seqAgent_vendas", "targetHandle": "seqAgent_vendas-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-condition-vendas" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-suporte-Condition", "target": "seqAgent_suporte", "targetHandle": "seqAgent_suporte-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-condition-suporte" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-rh-Condition", "target": "seqAgent_rh", "targetHandle": "seqAgent_rh-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-condition-rh" },
+    { "source": "seqCondition_0", "sourceHandle": "seqCondition_0-output-geral-Condition", "target": "seqAgent_geral", "targetHandle": "seqAgent_geral-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-condition-geral" },
+    { "source": "seqAgent_vendas", "sourceHandle": "seqAgent_vendas-output-seqAgent-Agent", "target": "seqEnd_0", "targetHandle": "seqEnd_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-vendas-end" },
+    { "source": "seqAgent_suporte", "sourceHandle": "seqAgent_suporte-output-seqAgent-Agent", "target": "seqEnd_0", "targetHandle": "seqEnd_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-suporte-end" },
+    { "source": "seqAgent_rh", "sourceHandle": "seqAgent_rh-output-seqAgent-Agent", "target": "seqEnd_0", "targetHandle": "seqEnd_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-rh-end" },
+    { "source": "seqAgent_geral", "sourceHandle": "seqAgent_geral-output-seqAgent-Agent", "target": "seqEnd_0", "targetHandle": "seqEnd_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-geral-end" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_classificador", "targetHandle": "seqAgent_classificador-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-classificador" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_vendas", "targetHandle": "seqAgent_vendas-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-vendas" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_suporte", "targetHandle": "seqAgent_suporte-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-suporte" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_rh", "targetHandle": "seqAgent_rh-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-rh" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_geral", "targetHandle": "seqAgent_geral-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-geral" }
+  ]
+}

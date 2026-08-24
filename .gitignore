@@ -1,0 +1,17 @@
+# Flowise source code (não subir o clone do repo oficial)
+flowise-main/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Exercícios pessoais (opcional, remova se quiser subir)
+# EXERCICIOS/

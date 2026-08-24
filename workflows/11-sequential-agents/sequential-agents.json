@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "seqStart_0",
+      "position": { "x": 50, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "id": "seqStart_0",
+        "label": "Start",
+        "version": 2,
+        "name": "seqStart",
+        "type": "Start",
+        "baseClasses": ["Start"],
+        "category": "Sequential Agents",
+        "description": "Starting point of the conversation",
+        "inputParams": [],
+        "inputAnchors": [],
+        "inputs": {},
+        "outputAnchors": [
+          { "id": "seqStart_0-output-seqStart-Start", "name": "seqStart", "label": "Start", "type": "Start" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 150
+    },
+    {
+      "id": "seqAgent_0",
+      "position": { "x": 450, "y": 50 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_0",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "Agent node in a sequential workflow",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "placeholder": "Agent", "id": "seqAgent_0-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_0-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_0-input-maxIterations-number" },
+          { "label": "Human Message", "name": "humanMessage", "type": "string", "rows": 4, "optional": true, "description": "Custom human message to use", "id": "seqAgent_0-input-humanMessage-string" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_0-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_0-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_0-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqStart_0.data.instance}}",
+          "agentName": "Pesquisador",
+          "systemPrompt": "Você é um PESQUISADOR especialista. Sua tarefa é:\n1. Receber o tema do usuário\n2. Criar um OUTLINE (estrutura) detalhado para um artigo sobre o tema\n3. Listar os pontos principais que devem ser abordados\n4. Incluir dados e fatos relevantes que você conhece\n\nFormate sua resposta como:\n- Título sugerido\n- 3-5 seções principais com bullets\n- Conclusão sugerida\n\nSeja objetivo e organize bem a informação.",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_0-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_1",
+      "position": { "x": 850, "y": 50 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_1",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "Agent node in a sequential workflow",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "placeholder": "Agent", "id": "seqAgent_1-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_1-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_1-input-maxIterations-number" },
+          { "label": "Human Message", "name": "humanMessage", "type": "string", "rows": 4, "optional": true, "id": "seqAgent_1-input-humanMessage-string" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_1-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_1-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_1-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqAgent_0.data.instance}}",
+          "agentName": "Escritor",
+          "systemPrompt": "Você é um ESCRITOR profissional de conteúdo. Você recebe um outline/estrutura de artigo do Pesquisador e sua tarefa é:\n1. Transformar o outline em um ARTIGO COMPLETO e bem escrito\n2. Escrever em português do Brasil fluente e envolvente\n3. Cada seção deve ter 2-3 parágrafos\n4. Usar linguagem acessível mas informativa\n5. Incluir uma introdução cativante e conclusão forte\n\nNÃO adicione informações que não estavam no outline. Apenas expanda e dê forma literária ao conteúdo fornecido pelo Pesquisador.",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_1-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqAgent_2",
+      "position": { "x": 1250, "y": 50 },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_2",
+        "label": "Agent",
+        "version": 4,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": ["Agent"],
+        "category": "Sequential Agents",
+        "description": "Agent node in a sequential workflow",
+        "inputParams": [
+          { "label": "Agent Name", "name": "agentName", "type": "string", "placeholder": "Agent", "id": "seqAgent_2-input-agentName-string" },
+          { "label": "System Prompt", "name": "systemPrompt", "type": "string", "rows": 4, "id": "seqAgent_2-input-systemPrompt-string" },
+          { "label": "Max Iterations", "name": "maxIterations", "type": "number", "default": 5, "optional": true, "id": "seqAgent_2-input-maxIterations-number" },
+          { "label": "Human Message", "name": "humanMessage", "type": "string", "rows": 4, "optional": true, "id": "seqAgent_2-input-humanMessage-string" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "seqAgent_2-input-model-BaseChatModel" },
+          { "label": "Tools", "name": "tools", "type": "Tool", "list": true, "optional": true, "id": "seqAgent_2-input-tools-Tool" },
+          { "label": "Start | Agent | Condition", "name": "sequentialNode", "type": "Start | Agent | Condition | LLMNode", "id": "seqAgent_2-input-sequentialNode-Start" }
+        ],
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "tools": [],
+          "sequentialNode": "{{seqAgent_1.data.instance}}",
+          "agentName": "Revisor",
+          "systemPrompt": "Você é um REVISOR/EDITOR profissional. Você recebe um artigo escrito pelo Escritor e sua tarefa é:\n1. REVISAR gramática, ortografia e pontuação\n2. MELHORAR a clareza e fluidez do texto\n3. VERIFICAR a coerência entre seções\n4. SUGERIR melhorias no título se necessário\n5. FORMATAR com markdown (## para títulos, **negrito** para destaques)\n\nRetorne o artigo FINAL revisado e formatado, pronto para publicação.\nNÃO adicione conteúdo novo — apenas melhore o que o Escritor produziu.\n\nAo final, adicione uma nota: '---\\n✅ Artigo revisado e aprovado pelo Editor.'",
+          "maxIterations": "3"
+        },
+        "outputAnchors": [
+          { "id": "seqAgent_2-output-seqAgent-Agent", "name": "seqAgent", "label": "Agent", "type": "Agent" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 600
+    },
+    {
+      "id": "seqEnd_0",
+      "position": { "x": 1650, "y": 250 },
+      "type": "customNode",
+      "data": {
+        "id": "seqEnd_0",
+        "label": "End",
+        "version": 1,
+        "name": "seqEnd",
+        "type": "End",
+        "baseClasses": ["End"],
+        "category": "Sequential Agents",
+        "description": "End node of the sequential workflow",
+        "inputParams": [],
+        "inputAnchors": [
+          { "label": "Agent | Condition | LLMNode", "name": "sequentialNode", "type": "Agent | Condition | LLMNode", "id": "seqEnd_0-input-sequentialNode-Agent" }
+        ],
+        "inputs": {
+          "sequentialNode": "{{seqAgent_2.data.instance}}"
+        },
+        "outputAnchors": [],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 150
+    },
+    {
+      "id": "chatOpenAI_0",
+      "position": { "x": 850, "y": -350 },
+      "type": "customNode",
+      "data": {
+        "id": "chatOpenAI_0",
+        "label": "ChatOllama",
+        "version": 4,
+        "name": "chatOllama",
+        "type": "ChatOllama",
+        "baseClasses": ["ChatOllama", "BaseChatModel", "BaseLanguageModel", "Runnable"],
+        "category": "Chat Models",
+        "description": "Chat completion using open-source LLM on Ollama",
+        "inputParams": [
+          { "label": "Base URL", "name": "baseUrl", "type": "string", "default": "http://host.containers.internal:11434", "id": "chatOpenAI_0-input-baseUrl-string" },
+          { "label": "Model Name", "name": "modelName", "type": "string", "placeholder": "llama3.2", "id": "chatOpenAI_0-input-modelName-string" },
+          { "label": "Temperature", "name": "temperature", "type": "number", "default": 0.7, "optional": true, "id": "chatOpenAI_0-input-temperature-number" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "baseUrl": "http://host.containers.internal:11434", "modelName": "llama3.2", "temperature": "0.7" },
+        "outputAnchors": [
+          { "id": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "name": "chatOllama", "label": "ChatOllama", "type": "ChatOllama | BaseChatModel | BaseLanguageModel | Runnable" }
+        ],
+        "outputs": {}, "selected": false
+      },
+      "width": 300, "height": 400
+    }
+  ],
+  "edges": [
+    { "source": "seqStart_0", "sourceHandle": "seqStart_0-output-seqStart-Start", "target": "seqAgent_0", "targetHandle": "seqAgent_0-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-start-agent0" },
+    { "source": "seqAgent_0", "sourceHandle": "seqAgent_0-output-seqAgent-Agent", "target": "seqAgent_1", "targetHandle": "seqAgent_1-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-agent0-agent1" },
+    { "source": "seqAgent_1", "sourceHandle": "seqAgent_1-output-seqAgent-Agent", "target": "seqAgent_2", "targetHandle": "seqAgent_2-input-sequentialNode-Start", "type": "buttonedge", "id": "edge-agent1-agent2" },
+    { "source": "seqAgent_2", "sourceHandle": "seqAgent_2-output-seqAgent-Agent", "target": "seqEnd_0", "targetHandle": "seqEnd_0-input-sequentialNode-Agent", "type": "buttonedge", "id": "edge-agent2-end" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_0", "targetHandle": "seqAgent_0-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-agent0" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_1", "targetHandle": "seqAgent_1-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-agent1" },
+    { "source": "chatOpenAI_0", "sourceHandle": "chatOpenAI_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "seqAgent_2", "targetHandle": "seqAgent_2-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-agent2" }
+  ]
+}

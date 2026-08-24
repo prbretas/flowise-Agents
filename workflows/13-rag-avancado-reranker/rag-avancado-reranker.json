@@ -1,0 +1,184 @@
+{
+  "nodes": [
+    {
+      "id": "pdfFile_0",
+      "position": { "x": -500, "y": 100 },
+      "type": "customNode",
+      "data": {
+        "id": "pdfFile_0", "label": "Pdf File", "version": 1, "name": "pdfFile", "type": "Document",
+        "baseClasses": ["Document"], "category": "Document Loaders",
+        "inputParams": [
+          { "label": "Pdf File", "name": "pdfFile", "type": "file", "fileType": ".pdf", "id": "pdfFile_0-input-pdfFile-file" },
+          { "label": "Usage", "name": "usage", "type": "options", "options": [{"label": "One document per page", "name": "perPage"}, {"label": "One document per file", "name": "perFile"}], "default": "perPage", "optional": true, "id": "pdfFile_0-input-usage-options" }
+        ],
+        "inputAnchors": [{ "label": "Text Splitter", "name": "textSplitter", "type": "TextSplitter", "optional": true, "id": "pdfFile_0-input-textSplitter-TextSplitter" }],
+        "inputs": { "textSplitter": "{{recursiveCharacterTextSplitter_0.data.instance}}", "usage": "perPage" },
+        "outputAnchors": [{ "id": "pdfFile_0-output-pdfFile-Document", "name": "pdfFile", "label": "Document", "type": "Document" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 400
+    },
+    {
+      "id": "recursiveCharacterTextSplitter_0",
+      "position": { "x": -900, "y": 150 },
+      "type": "customNode",
+      "data": {
+        "id": "recursiveCharacterTextSplitter_0", "label": "Recursive Character Text Splitter", "version": 2, "name": "recursiveCharacterTextSplitter", "type": "RecursiveCharacterTextSplitter",
+        "baseClasses": ["RecursiveCharacterTextSplitter", "TextSplitter", "BaseDocumentTransformer", "Runnable"], "category": "Text Splitters",
+        "inputParams": [
+          { "label": "Chunk Size", "name": "chunkSize", "type": "number", "default": 1000, "optional": true, "id": "recursiveCharacterTextSplitter_0-input-chunkSize-number" },
+          { "label": "Chunk Overlap", "name": "chunkOverlap", "type": "number", "default": 200, "optional": true, "id": "recursiveCharacterTextSplitter_0-input-chunkOverlap-number" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "chunkSize": 800, "chunkOverlap": 200 },
+        "outputAnchors": [{ "id": "recursiveCharacterTextSplitter_0-output-recursiveCharacterTextSplitter-RecursiveCharacterTextSplitter|TextSplitter|BaseDocumentTransformer|Runnable", "name": "recursiveCharacterTextSplitter", "label": "RecursiveCharacterTextSplitter", "type": "RecursiveCharacterTextSplitter | TextSplitter | BaseDocumentTransformer | Runnable" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 300
+    },
+    {
+      "id": "ollamaEmbedding_0",
+      "position": { "x": -200, "y": 500 },
+      "type": "customNode",
+      "data": {
+        "id": "ollamaEmbedding_0", "label": "Ollama Embeddings", "version": 2, "name": "ollamaEmbedding", "type": "OllamaEmbeddings",
+        "baseClasses": ["OllamaEmbeddings", "Embeddings"], "category": "Embeddings",
+        "inputParams": [
+          { "label": "Base URL", "name": "baseUrl", "type": "string", "default": "http://host.containers.internal:11434", "id": "ollamaEmbedding_0-input-baseUrl-string" },
+          { "label": "Model Name", "name": "modelName", "type": "string", "id": "ollamaEmbedding_0-input-modelName-string" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "baseUrl": "http://host.containers.internal:11434", "modelName": "nomic-embed-text" },
+        "outputAnchors": [{ "id": "ollamaEmbedding_0-output-ollamaEmbedding-OllamaEmbeddings|Embeddings", "name": "ollamaEmbedding", "label": "OllamaEmbeddings", "type": "OllamaEmbeddings | Embeddings" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 300
+    },
+    {
+      "id": "memoryVectorStore_0",
+      "position": { "x": 200, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "id": "memoryVectorStore_0", "label": "In-Memory Vector Store", "version": 1, "name": "memoryVectorStore", "type": "Memory",
+        "baseClasses": ["Memory", "VectorStoreRetriever", "BaseRetriever"], "category": "Vector Stores",
+        "inputParams": [{ "label": "Top K", "name": "topK", "type": "number", "placeholder": "4", "optional": true, "id": "memoryVectorStore_0-input-topK-number" }],
+        "inputAnchors": [
+          { "label": "Document", "name": "document", "type": "Document", "list": true, "optional": true, "id": "memoryVectorStore_0-input-document-Document" },
+          { "label": "Embeddings", "name": "embeddings", "type": "Embeddings", "id": "memoryVectorStore_0-input-embeddings-Embeddings" }
+        ],
+        "inputs": { "document": ["{{pdfFile_0.data.instance}}"], "embeddings": "{{ollamaEmbedding_0.data.instance}}", "topK": "10" },
+        "outputAnchors": [{ "id": "memoryVectorStore_0-output-retriever-Memory|VectorStoreRetriever|BaseRetriever", "name": "retriever", "label": "Memory Retriever", "type": "Memory | VectorStoreRetriever | BaseRetriever" }],
+        "outputs": { "output": "memoryVectorStore_0-output-retriever-Memory|VectorStoreRetriever|BaseRetriever" }, "selected": false
+      }, "width": 300, "height": 400
+    },
+    {
+      "id": "chatOllama_reranker",
+      "position": { "x": 200, "y": 650 },
+      "type": "customNode",
+      "data": {
+        "id": "chatOllama_reranker", "label": "ChatOllama", "version": 4, "name": "chatOllama", "type": "ChatOllama",
+        "baseClasses": ["ChatOllama", "BaseChatModel", "BaseLanguageModel", "Runnable"], "category": "Chat Models",
+        "description": "LLM usado como reranker - avalia relevancia dos chunks",
+        "inputParams": [
+          { "label": "Base URL", "name": "baseUrl", "type": "string", "default": "http://host.containers.internal:11434", "id": "chatOllama_reranker-input-baseUrl-string" },
+          { "label": "Model Name", "name": "modelName", "type": "string", "id": "chatOllama_reranker-input-modelName-string" },
+          { "label": "Temperature", "name": "temperature", "type": "number", "default": 0.7, "optional": true, "id": "chatOllama_reranker-input-temperature-number" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "baseUrl": "http://host.containers.internal:11434", "modelName": "llama3.2", "temperature": "0" },
+        "outputAnchors": [{ "id": "chatOllama_reranker-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "name": "chatOllama", "label": "ChatOllama", "type": "ChatOllama | BaseChatModel | BaseLanguageModel | Runnable" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 400
+    },
+    {
+      "id": "llmFilterRetriever_0",
+      "position": { "x": 600, "y": 300 },
+      "type": "customNode",
+      "data": {
+        "id": "llmFilterRetriever_0", "label": "LLM Filter Retriever", "version": 1, "name": "llmFilterRetriever", "type": "LLMFilterCompressorRetriever",
+        "baseClasses": ["LLMFilterCompressorRetriever", "BaseRetriever", "Runnable"], "category": "Retrievers",
+        "description": "Uses an LLM to filter and compress retrieved documents based on relevance to the query",
+        "inputParams": [],
+        "inputAnchors": [
+          { "label": "Base Retriever", "name": "baseRetriever", "type": "BaseRetriever", "id": "llmFilterRetriever_0-input-baseRetriever-BaseRetriever" },
+          { "label": "Language Model", "name": "model", "type": "BaseLanguageModel", "id": "llmFilterRetriever_0-input-model-BaseLanguageModel" }
+        ],
+        "inputs": { "baseRetriever": "{{memoryVectorStore_0.data.instance}}", "model": "{{chatOllama_reranker.data.instance}}" },
+        "outputAnchors": [{ "id": "llmFilterRetriever_0-output-llmFilterRetriever-LLMFilterCompressorRetriever|BaseRetriever|Runnable", "name": "llmFilterRetriever", "label": "LLM Filter Retriever", "type": "LLMFilterCompressorRetriever | BaseRetriever | Runnable" }],
+        "outputs": { "output": "llmFilterRetriever_0-output-llmFilterRetriever-LLMFilterCompressorRetriever|BaseRetriever|Runnable" }, "selected": false
+      }, "width": 300, "height": 350
+    },
+    {
+      "id": "chatOllama_0",
+      "position": { "x": 1000, "y": 0 },
+      "type": "customNode",
+      "data": {
+        "id": "chatOllama_0", "label": "ChatOllama", "version": 4, "name": "chatOllama", "type": "ChatOllama",
+        "baseClasses": ["ChatOllama", "BaseChatModel", "BaseLanguageModel", "Runnable"], "category": "Chat Models",
+        "description": "LLM principal para gerar respostas",
+        "inputParams": [
+          { "label": "Base URL", "name": "baseUrl", "type": "string", "default": "http://host.containers.internal:11434", "id": "chatOllama_0-input-baseUrl-string" },
+          { "label": "Model Name", "name": "modelName", "type": "string", "id": "chatOllama_0-input-modelName-string" },
+          { "label": "Temperature", "name": "temperature", "type": "number", "default": 0.7, "optional": true, "id": "chatOllama_0-input-temperature-number" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "baseUrl": "http://host.containers.internal:11434", "modelName": "llama3.2", "temperature": "0.3" },
+        "outputAnchors": [{ "id": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "name": "chatOllama", "label": "ChatOllama", "type": "ChatOllama | BaseChatModel | BaseLanguageModel | Runnable" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 400
+    },
+    {
+      "id": "bufferMemory_0",
+      "position": { "x": 1000, "y": 500 },
+      "type": "customNode",
+      "data": {
+        "id": "bufferMemory_0", "label": "Buffer Memory", "version": 2, "name": "bufferMemory", "type": "BufferMemory",
+        "baseClasses": ["BufferMemory", "BaseChatMemory", "BaseMemory"], "category": "Memory",
+        "inputParams": [
+          { "label": "Memory Key", "name": "memoryKey", "type": "string", "default": "chat_history", "id": "bufferMemory_0-input-memoryKey-string" },
+          { "label": "Input Key", "name": "inputKey", "type": "string", "default": "question", "id": "bufferMemory_0-input-inputKey-string" }
+        ],
+        "inputAnchors": [],
+        "inputs": { "memoryKey": "chat_history", "inputKey": "question" },
+        "outputAnchors": [{ "id": "bufferMemory_0-output-bufferMemory-BufferMemory|BaseChatMemory|BaseMemory", "name": "bufferMemory", "label": "BufferMemory", "type": "BufferMemory | BaseChatMemory | BaseMemory" }],
+        "outputs": {}, "selected": false
+      }, "width": 300, "height": 300
+    },
+    {
+      "id": "conversationalRetrievalQAChain_0",
+      "position": { "x": 1400, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "id": "conversationalRetrievalQAChain_0", "label": "Conversational Retrieval QA Chain", "version": 3, "name": "conversationalRetrievalQAChain", "type": "ConversationalRetrievalQAChain",
+        "baseClasses": ["ConversationalRetrievalQAChain", "BaseChain", "Runnable"], "category": "Chains",
+        "inputParams": [
+          { "label": "Return Source Documents", "name": "returnSourceDocuments", "type": "boolean", "optional": true, "id": "conversationalRetrievalQAChain_0-input-returnSourceDocuments-boolean" },
+          { "label": "System Message", "name": "systemMessagePrompt", "type": "string", "rows": 4, "optional": true, "additionalParams": true, "id": "conversationalRetrievalQAChain_0-input-systemMessagePrompt-string" },
+          { "label": "Chain Option", "name": "chainOption", "type": "options", "options": [{"label": "StuffDocumentsChain", "name": "stuff"}, {"label": "RefineDocumentsChain", "name": "refine"}], "default": "stuff", "optional": true, "additionalParams": true, "id": "conversationalRetrievalQAChain_0-input-chainOption-options" }
+        ],
+        "inputAnchors": [
+          { "label": "Chat Model", "name": "model", "type": "BaseChatModel", "id": "conversationalRetrievalQAChain_0-input-model-BaseChatModel" },
+          { "label": "Vector Store Retriever", "name": "vectorStoreRetriever", "type": "BaseRetriever", "id": "conversationalRetrievalQAChain_0-input-vectorStoreRetriever-BaseRetriever" },
+          { "label": "Memory", "name": "memory", "type": "BaseMemory", "optional": true, "id": "conversationalRetrievalQAChain_0-input-memory-BaseMemory" }
+        ],
+        "inputs": {
+          "model": "{{chatOllama_0.data.instance}}",
+          "vectorStoreRetriever": "{{llmFilterRetriever_0.data.instance}}",
+          "memory": "{{bufferMemory_0.data.instance}}",
+          "returnSourceDocuments": true,
+          "systemMessagePrompt": "Você é um assistente de pesquisa avançado. Responda APENAS com base nos documentos filtrados fornecidos. Os documentos já passaram por um filtro de relevância, então são altamente pertinentes à pergunta. Responda em português do Brasil. Se mesmo após a filtragem não houver info suficiente, diga claramente.",
+          "chainOption": "stuff"
+        },
+        "outputAnchors": [{ "id": "conversationalRetrievalQAChain_0-output-conversationalRetrievalQAChain-ConversationalRetrievalQAChain|BaseChain|Runnable", "name": "conversationalRetrievalQAChain", "label": "ConversationalRetrievalQAChain", "type": "ConversationalRetrievalQAChain | BaseChain | Runnable" }],
+        "outputs": { "output": "conversationalRetrievalQAChain_0-output-conversationalRetrievalQAChain-ConversationalRetrievalQAChain|BaseChain|Runnable" }, "selected": false
+      }, "width": 300, "height": 550
+    }
+  ],
+  "edges": [
+    { "source": "recursiveCharacterTextSplitter_0", "sourceHandle": "recursiveCharacterTextSplitter_0-output-recursiveCharacterTextSplitter-RecursiveCharacterTextSplitter|TextSplitter|BaseDocumentTransformer|Runnable", "target": "pdfFile_0", "targetHandle": "pdfFile_0-input-textSplitter-TextSplitter", "type": "buttonedge", "id": "edge-splitter-pdf" },
+    { "source": "pdfFile_0", "sourceHandle": "pdfFile_0-output-pdfFile-Document", "target": "memoryVectorStore_0", "targetHandle": "memoryVectorStore_0-input-document-Document", "type": "buttonedge", "id": "edge-pdf-vs" },
+    { "source": "ollamaEmbedding_0", "sourceHandle": "ollamaEmbedding_0-output-ollamaEmbedding-OllamaEmbeddings|Embeddings", "target": "memoryVectorStore_0", "targetHandle": "memoryVectorStore_0-input-embeddings-Embeddings", "type": "buttonedge", "id": "edge-emb-vs" },
+    { "source": "memoryVectorStore_0", "sourceHandle": "memoryVectorStore_0-output-retriever-Memory|VectorStoreRetriever|BaseRetriever", "target": "llmFilterRetriever_0", "targetHandle": "llmFilterRetriever_0-input-baseRetriever-BaseRetriever", "type": "buttonedge", "id": "edge-vs-filter" },
+    { "source": "chatOllama_reranker", "sourceHandle": "chatOllama_reranker-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "llmFilterRetriever_0", "targetHandle": "llmFilterRetriever_0-input-model-BaseLanguageModel", "type": "buttonedge", "id": "edge-reranker-filter" },
+    { "source": "llmFilterRetriever_0", "sourceHandle": "llmFilterRetriever_0-output-llmFilterRetriever-LLMFilterCompressorRetriever|BaseRetriever|Runnable", "target": "conversationalRetrievalQAChain_0", "targetHandle": "conversationalRetrievalQAChain_0-input-vectorStoreRetriever-BaseRetriever", "type": "buttonedge", "id": "edge-filter-chain" },
+    { "source": "chatOllama_0", "sourceHandle": "chatOllama_0-output-chatOllama-ChatOllama|BaseChatModel|BaseLanguageModel|Runnable", "target": "conversationalRetrievalQAChain_0", "targetHandle": "conversationalRetrievalQAChain_0-input-model-BaseChatModel", "type": "buttonedge", "id": "edge-model-chain" },
+    { "source": "bufferMemory_0", "sourceHandle": "bufferMemory_0-output-bufferMemory-BufferMemory|BaseChatMemory|BaseMemory", "target": "conversationalRetrievalQAChain_0", "targetHandle": "conversationalRetrievalQAChain_0-input-memory-BaseMemory", "type": "buttonedge", "id": "edge-mem-chain" }
+  ]
+}
