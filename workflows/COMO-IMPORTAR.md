@@ -1,251 +1,172 @@
-# 📥 Como Importar Workflows no Flowise
+# Como Importar Workflows no Flowise
 
-## Guia Passo-a-Passo (com imagens mentais)
+## Pre-requisitos
 
-Este guia ensina como pegar os arquivos `.json` deste repositório e carregá-los
-no Flowise para executar imediatamente.
+- Flowise rodando em http://localhost:3000
+- Ollama rodando com modelos `llama3.2` e `nomic-embed-text`
+- Os arquivos `.json` deste repositorio
 
----
-
-## Pré-requisitos
-
-- ✅ Flowise instalado e rodando (http://localhost:3000)
-- ✅ Ter os arquivos `.json` dos workflows (estão neste repositório)
-- ✅ Ter uma API Key da OpenAI (ou Ollama instalado localmente)
+> Use `.\iniciar.ps1` para subir tudo automaticamente.
 
 ---
 
-## Método 1: Importar pelo Menu (Recomendado)
+## Importar um Chatflow (Workflows 01 a 10, 13 e 15)
 
 ### Passo 1 — Abrir o Flowise
-Acesse `http://localhost:3000` no seu navegador.
+Acesse `http://localhost:3000` no navegador.
 
-### Passo 2 — Ir para Chatflows
+### Passo 2 — Criar novo Chatflow
 No menu lateral esquerdo, clique em **"Chatflows"**.
+Depois clique no botao **"+ Add New"** (canto superior direito).
 
-### Passo 3 — Criar novo Chatflow
-Clique no botão **"+ Add New"** (canto superior direito).
+### Passo 3 — Carregar o JSON
+Na tela do canvas (area branca com grid), olhe no canto superior esquerdo.
+Clique no icone **"⋮" (tres pontos verticais)** → **"Load Chatflow"**.
 
-### Passo 4 — Abrir o menu de configuração
-Na tela do canvas (área branca com grid), olhe para o canto superior direito.
-Clique no ícone de **⚙️ (engrenagem)** ou no menu **"⋮" (três pontos)**.
+### Passo 4 — Selecionar o arquivo
+Navegue ate a pasta do workflow e selecione o `.json`.
 
-### Passo 5 — Selecionar "Load Chatflow"
-No menu dropdown que aparecer, clique em **"Load Chatflow"**.
+### Passo 5 — Salvar
+Clique no botao **💾 (disquete)** no canto superior direito.
+De um nome ao chatflow (ex: "01 - Chatbot Simples").
 
-### Passo 6 — Selecionar o arquivo JSON
-Na janela de seleção de arquivo, navegue até a pasta do workflow desejado e
-selecione o arquivo `.json`:
-
-| Workflow | Arquivo |
-|----------|---------|
-| 01 - Chatbot Simples | `workflows/01-chatbot-simples/chatbot-simples.json` |
-| 02 - Chatbot com Memória | `workflows/02-chatbot-com-memoria/chatbot-memoria.json` |
-| 03 - RAG com Documentos | `workflows/03-rag-documentos/rag-documentos.json` |
-| 04 - Agente com Tools | `workflows/04-agente-com-tools/agente-tools.json` |
-| 05 - Agente Custom Tool | `workflows/05-agente-custom-tool/agente-custom-tool.json` |
-
-### Passo 7 — Configurar a API Key
-Após a importação, os nodes aparecerão no canvas. Agora:
-
-1. Clique no node **"ChatOpenAI"** (azul/roxo)
-2. No campo **"Connect Credential"**, clique em **"Create New"**
-3. Dê um nome (ex: "Minha OpenAI Key")
-4. Cole sua API Key no campo (começa com `sk-...`)
-5. Clique **"Add"**
-
-### Passo 8 — Salvar
-Clique no botão **💾 (disquete)** no canto superior direito para salvar.
-Dê um nome ao chatflow (ex: "01 - Chatbot Simples").
-
-### Passo 9 — Testar!
-Clique no ícone de **💬 (balão de chat)** no canto inferior direito.
-Uma janela de chat abrirá. Digite sua primeira mensagem e veja funcionar!
+### Passo 6 — Testar
+Clique no icone **💬 (balao de chat)** no canto inferior direito.
+Digite uma mensagem e veja a resposta.
 
 ---
 
-## Método 2: Importar pela API (Avançado)
+## Importar um Agentflow (Workflows 11, 12 e 14)
 
-Se preferir usar a API REST do Flowise:
+Os workflows 11 (Sequential Agents), 12 (Roteamento Condicional) e 14 (Multi-Agent Supervisor)
+sao **Agentflows** — usam nodes diferentes (Start, Agent, Condition, End).
 
-```bash
-curl -X POST http://localhost:3000/api/v1/chatflows \
-  -H "Content-Type: application/json" \
-  -d @workflows/01-chatbot-simples/chatbot-simples.json
-```
+### Passo 1 — Ir para Agentflows
+No menu lateral esquerdo, clique em **"Agentflows"** (nao Chatflows!).
 
-> Nota: Este método é útil para automação, mas para aprendizado use o Método 1.
+### Passo 2 — Criar novo Agentflow
+Clique no botao **"+ Add New"**.
 
----
+### Passo 3 — Carregar o JSON
+No canvas, clique em **"⋮" (tres pontos)** → **"Load Chatflow"**.
+(O botao tem o mesmo nome, mas funciona para Agentflows tambem.)
 
-## Configuração por Workflow
-
-### Workflow 01 — Chatbot Simples
-| O que configurar | Onde | O que colocar |
-|-----------------|------|---------------|
-| API Key | Node "ChatOpenAI" → Connect Credential | Sua OpenAI Key |
-| (Opcional) Modelo | Node "ChatOpenAI" → Model Name | gpt-4o-mini (padrão) |
-
-### Workflow 02 — Chatbot com Memória
-| O que configurar | Onde | O que colocar |
-|-----------------|------|---------------|
-| API Key | Node "ChatOpenAI" → Connect Credential | Sua OpenAI Key |
-| (Opcional) Personalidade | Node "Conversation Chain" → System Message | Texto livre |
-
-### Workflow 03 — RAG com Documentos
-| O que configurar | Onde | O que colocar |
-|-----------------|------|---------------|
-| API Key (Chat) | Node "ChatOpenAI" → Connect Credential | Sua OpenAI Key |
-| API Key (Embeddings) | Node "OpenAI Embeddings" → Connect Credential | Mesma OpenAI Key |
-| PDF | Node "Pdf File" → Upload | Qualquer arquivo PDF |
-| **Upsert** | Botão "Upsert" (ícone ↑) no topo | Clicar após upload |
-
-> ⚠️ **IMPORTANTE:** Após fazer upload do PDF, clique no botão **"Upsert"** para
-> processar o documento. Sem isso, o chatbot não terá acesso ao conteúdo!
-
-### Workflow 04 — Agente com Tools
-| O que configurar | Onde | O que colocar |
-|-----------------|------|---------------|
-| API Key (OpenAI) | Node "ChatOpenAI" → Connect Credential | Sua OpenAI Key |
-| (Opcional) SearchApi Key | Node "SearchApi" → Connect Credential | Key do searchapi.io |
-
-> Se não tiver SearchApi: delete a conexão (edge) entre SearchApi e o Agent.
-> O workflow funcionará apenas com a Calculator.
-
-### Workflow 05 — Agente com Custom Tool
-| O que configurar | Onde | O que colocar |
-|-----------------|------|---------------|
-| API Key | Node "ChatOpenAI" → Connect Credential | Sua OpenAI Key |
-| Custom Tool | **Criar ANTES** em Tools → Add New | Ver README do workflow 05 |
-| Selecionar Tool | Node "Custom Tool" → Select Tool | Escolher "consultar_cep" |
-
-> ⚠️ **IMPORTANTE:** Você precisa criar a Custom Tool separadamente ANTES de
-> selecionar no workflow. Veja o README do workflow 05 para instruções detalhadas.
+### Passo 4 — Selecionar, salvar e testar
+Mesmo processo: selecione o JSON, salve, abra o chat.
 
 ---
 
-## Dicas Importantes
+## Tabela de Workflows
 
-### 💡 Credential compartilhada
-Após criar a credential da OpenAI uma vez, ela fica salva no Flowise.
-Nos próximos workflows, basta selecionar a credential existente (não precisa criar de novo).
+| # | Workflow | Tipo | Arquivo JSON |
+|---|---------|------|-------------|
+| 01 | Chatbot Simples | Chatflow | `01-chatbot-simples/chatbot-simples.json` |
+| 02 | Chatbot com Memoria | Chatflow | `02-chatbot-com-memoria/chatbot-memoria.json` |
+| 03 | RAG com Documentos | Chatflow | `03-rag-documentos/rag-documentos.json` |
+| 04 | Agente com Tools | Chatflow | `04-agente-com-tools/agente-tools.json` |
+| 05 | Agente Custom Tool | Chatflow | `05-agente-custom-tool/agente-custom-tool.json` |
+| 06 | RAG Multiplas Fontes | Chatflow | `06-rag-multiplas-fontes/rag-multiplas-fontes.json` |
+| 07 | Structured Output | Chatflow | `07-structured-output/structured-output.json` |
+| 08 | RAG + Agent | Chatflow | `08-rag-agent-combinado/rag-agent-combinado.json` |
+| 09 | Moderacao e Filtros | Chatflow | `09-moderacao-filtros/moderacao-filtros.json` |
+| 10 | Multiplas Custom Tools | Chatflow | `10-multiplas-custom-tools/multiplas-custom-tools.json` |
+| 11 | Sequential Agents | **Agentflow** | `11-sequential-agents/sequential-agents.json` |
+| 12 | Roteamento Condicional | **Agentflow** | `12-roteamento-condicional/roteamento-condicional.json` |
+| 13 | RAG Avancado Reranker | Chatflow | `13-rag-avancado-reranker/rag-avancado-reranker.json` |
+| 14 | Multi-Agent Supervisor | **Agentflow** | `14-multi-agent-supervisor/multi-agent-supervisor.json` |
+| 15 | Chatbot Full-Stack | Chatflow | `15-chatbot-fullstack-deploy/chatbot-fullstack.json` |
 
-### 💡 Como saber se está funcionando
+---
+
+## Configuracao por Workflow (Ollama)
+
+Todos os workflows ja vem configurados para Ollama. Nao precisa de API key.
+
+Os nodes **ChatOllama** e **Ollama Embeddings** usam:
+- **Base URL:** `http://host.containers.internal:11434`
+- **Chat Model:** `llama3.2`
+- **Embeddings Model:** `nomic-embed-text`
+- **Temperature:** varia por workflow (indicado em cada README)
+
+> **Se rodar Flowise FORA do container** (direto no Windows), troque
+> `host.containers.internal` por `localhost` nos nodes.
+
+### Workflows com configuracao extra
+
+| Workflow | O que configurar alem do padrao |
+|----------|--------------------------------|
+| 03 (RAG) | Upload de PDF + clicar Upsert |
+| 05 (Custom Tool) | Criar a tool ANTES em Tools → Add New (ver README do 05) |
+| 06 (Multiplas Fontes) | Upload PDF + Upload TXT + URL do web scraper + Upsert |
+| 08 (RAG + Agent) | Upload de PDF + Upsert |
+| 10 (Multi Tools) | Criar 3 custom tools ANTES (CEP, Clima, Crypto) |
+| 13 (Reranker) | Upload de PDF + Upsert |
+
+---
+
+## O que e "Upsert"?
+
+Nos workflows com RAG (03, 06, 08, 13), apos fazer upload do documento:
+
+1. Clique no icone **↑ (seta para cima)** ou botao **"Upsert"** no topo do canvas
+2. Isso processa o documento: divide em chunks → gera embeddings → armazena no vector store
+3. **Sem isso, o chatbot nao tera acesso ao conteudo do documento**
+
+Voce precisa fazer Upsert novamente se:
+- Trocar o documento
+- Reiniciar o Flowise (pois usa In-Memory Vector Store)
+
+---
+
+## Como saber se esta funcionando
+
 - ✅ Todos os nodes conectados (linhas entre eles)
-- ✅ Nenhum node com borda vermelha (indica erro)
-- ✅ Credential configurada (sem ícone de alerta no node)
-- ✅ Chat abre sem erro ao clicar no ícone de balão
-
-### 💡 Se der erro ao importar
-1. Verifique se o arquivo JSON está completo (não truncado)
-2. Verifique a versão do Flowise (>= 1.6.x recomendado)
-3. Tente criar um chatflow vazio e adicionar os nodes manualmente
-
-### 💡 Onde ficam os dados?
-- **Credentials:** Ficam salvas no banco do Flowise (SQLite por padrão)
-- **Chatflows:** Salvos no banco também
-- **Vetores (RAG):** No In-Memory (perde ao reiniciar) ou em vector store externo
-- **Histórico de chat:** Salvo no banco do Flowise
+- ✅ Nenhum node com borda vermelha
+- ✅ Chat abre sem erro ao clicar no icone de balao
+- ✅ Resposta aparece em alguns segundos (Ollama local pode demorar 5-15s)
 
 ---
 
-## Ordem de Execução Recomendada
+## Problemas Comuns
 
-```
-┌─────────────────┐
-│  INSTALAR        │
-│  FLOWISE         │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐     ┌─────────────────────────────────────────┐
-│  CRIAR           │     │  Acesse platform.openai.com              │
-│  OPENAI KEY      │────▶│  Gere uma API Key                        │
-└────────┬────────┘     │  Adicione créditos ($5 basta para testar)│
-         │              └─────────────────────────────────────────┘
-         ▼
-┌─────────────────┐
-│  WORKFLOW 01     │  ← Comece aqui! O mais simples.
-│  Chatbot Simples│
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  WORKFLOW 02     │  ← Adiciona memória ao chatbot.
-│  Com Memória     │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  WORKFLOW 03     │  ← Chatbot que responde sobre seus PDFs.
-│  RAG Documentos  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  WORKFLOW 04     │  ← Agente que usa ferramentas (calculator, web).
-│  Agente + Tools  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  WORKFLOW 05     │  ← Crie suas próprias ferramentas (APIs).
-│  Custom Tool     │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  PRÓXIMOS PASSOS │
-│  - Sequential    │
-│    Agents        │
-│  - WhatsApp      │
-│  - Deploy        │
-└─────────────────┘
-```
-
----
-
-## Problemas Comuns na Importação
-
-| Problema | Causa | Solução |
+| Problema | Causa | Solucao |
 |----------|-------|---------|
-| "Unable to load chatflow" | JSON mal formado | Redownload o arquivo |
-| Nodes aparecem desconectados | Versão diferente do Flowise | Reconecte manualmente |
-| "Credential not found" | API Key não configurada | Crie a credential no node |
-| Chat não abre | Flow não salvo | Clique em 💾 primeiro |
-| "Model not found" | Modelo não disponível na sua conta | Troque para gpt-4o-mini |
-| "Rate limit exceeded" | Muitas requisições à OpenAI | Aguarde 1 minuto e tente de novo |
-| Resposta vazia no RAG | PDF não processado | Clique em "Upsert" após upload |
-| Custom Tool não aparece | Tool não criada ainda | Crie em Tools → Add New primeiro |
+| "Unable to load chatflow" | JSON mal formado | Baixe novamente do repo |
+| Nodes desconectados | Versao diferente do Flowise | Reconecte manualmente as linhas |
+| Erro no ChatOllama | Ollama nao rodando | Execute `ollama serve` ou `.\iniciar.ps1` |
+| "Model not found" | Modelo nao baixado | Execute `ollama pull llama3.2` |
+| Resposta vazia no RAG | PDF nao processado | Clique em "Upsert" apos upload |
+| Custom Tool nao aparece | Tool nao criada ainda | Crie em Tools → Add New primeiro |
+| Timeout / muito lento | Modelo pesado + pouca RAM | Use `llama3.2` (leve) em vez de modelos maiores |
+| "Connection refused" no ChatOllama | URL errada | Use `http://host.containers.internal:11434` |
+| Agentflow nao importa em Chatflow | Tipo errado | Use menu "Agentflows" para workflows 11, 12, 14 |
 
 ---
 
-## Alternativa: Usar Ollama (100% Gratuito e Local)
+## Ordem Recomendada
 
-Se não quiser gastar com OpenAI, use Ollama:
-
-### 1. Instalar Ollama
-- Windows: https://ollama.com/download
-- Após instalar, abra o terminal e rode:
-```bash
-ollama pull llama3
 ```
-
-### 2. Substituir o Node nos Workflows
-Em vez de **ChatOpenAI**, use **ChatOllama**:
-- Base URL: `http://localhost:11434`
-- Model Name: `llama3` (ou `mistral`, `codellama`, etc.)
-- Temperature: mesma configuração
-
-### 3. Para Embeddings (Workflow 03)
-Em vez de **OpenAI Embeddings**, use **Ollama Embeddings**:
-- Base URL: `http://localhost:11434`
-- Model: `nomic-embed-text`
-
-```bash
-# Baixar o modelo de embeddings
-ollama pull nomic-embed-text
+.\iniciar.ps1 -Instalar     ← primeira vez (baixa modelos)
+.\iniciar.ps1               ← sobe tudo
+         │
+         ▼
+Workflow 01 (Chatbot Simples)         ← comece aqui
+         │
+         ▼
+Workflow 02 (Com Memoria)             ← adiciona memoria
+         │
+         ▼
+Workflow 03 (RAG)                     ← chat com seus PDFs
+         │
+         ▼
+Workflow 04 (Agent + Tools)           ← agente com calculadora
+         │
+         ▼
+Workflow 05 (Custom Tool)             ← crie suas ferramentas
+         │
+         ▼
+Workflows 06-10 (Intermediarios)      ← aprofundamento
+         │
+         ▼
+Workflows 11-15 (Avancados)           ← multi-agent, deploy
 ```
-
-> **Prós do Ollama:** Grátis, privado (dados não saem da sua máquina)
-> **Contras:** Mais lento que OpenAI, precisa de boa GPU para modelos grandes
